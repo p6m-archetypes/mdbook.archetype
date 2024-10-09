@@ -1,0 +1,12 @@
+---
+description: "mdbook Documentation"
+authors: ["Jimmie Fulton"]
+languages: ["markdown"]
+frameworks: ["mdbook"]
+tags: ["markdown", "mdbook", "documentation"]
+
+requires:
+  archetect: 2.0.0-ALPHA.10
+
+components:
+  org-prompts: git@github.com:p6m-dev/org-prompts.archetype.git

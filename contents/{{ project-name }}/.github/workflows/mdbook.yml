@@ -1,0 +1,89 @@
+name: Build and Publish mdbook
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches:
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+        with:
+          enablement: true
+
+      - name: Setup mdbook
+        uses: jontze/action-mdbook@v2
+        with:
+          token: ${{'{'}}{secrets.GITHUB_TOKEN}}
+          # Optional Plugins have to be enabled
+          use-linkcheck: true
+          use-mermaid: true
+          use-toc: true
+          use-opengh: true
+          use-admonish: true
+      - name: Show mdbook version
+        run: mdbook --version
+      - name: Show linkchecker version
+        run: mdbook-linkcheck --version
+      - name: Show mermaid version
+        run: mdbook-mermaid --version
+      - name: Show toc version
+        run: mdbook-toc --version
+      - name: Show open-on-gh version
+        run: mdbook-open-on-gh --version
+      - name: Show admonish version
+        run: mdbook-admonish --version
+
+      - name: Build Book
+        run: mdbook build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload entire repository
+          path: 'book'
+
+  # Single deploy job since we're just deploying
+  deploy:
+    # Add a dependency to the build job
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{'{'}}{steps.deployment.outputs.page_url}}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
+

@@ -1,0 +1,25 @@
+[book]
+title = "{{ project-title }}"{% if "TOC" in features %}
+
+authors = ["{{ author_full}}"]
+language = "en"
+multilingual = false
+src = "src"
+[preprocessor.toc]
+renderer = ["html"]{% endif %}{% if "MermaidJS" in features %}
+
+command = "mdbook-toc"
+[preprocessor.mermaid]
+command = "mdbook-mermaid"{% endif %}{% if "Admnish" in features %}
+
+[preprocessor.admonish]
+command = "mdbook-admonish"
+assets_version = "2.0.0"    # do not edit: managed by `mdbook-admonish install`{% endif %}
+
+[output.html]
+git-repository-url = "{% if repository-url %}{{ repository-url }}{% else %}<ADD URL>{% endif %}"{% if "MermaidJS" in features %}
+additional-js = ["mermaid.min.js", "mermaid-init.js"]{% endif %}{% if "Admonish" in features %}
+additional-css = ["mdbook-admonish.css"]{% endif %}
+fold.enable = true
+fold.level = 1
+preferred-dark-theme = "coal"
