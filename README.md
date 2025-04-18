@@ -2,4 +2,4 @@
 
 To render this archetype:
 
-    archetect render git@github.com:p6m-dev/mdbook.archetype.git
+    archetect render git@github.com:p6m-archetypes/mdbook.archetype.git
