@@ -1,13 +1,9 @@
-permissions: write-all
-
 name: Build and Publish mdbook
-
 on:
   # Runs on pushes targeting the default branch
   push:
     branches:
       - main
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -28,64 +24,51 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Setup Pages
-        uses: actions/configure-pages@v3
-        with:
-          enablement: true
-
+        uses: actions/configure-pages@v4
       - name: Setup mdbook
-        uses: jontze/action-mdbook@v2
+        uses: peaceiris/actions-mdbook@v1
         with:
-          token: ${{'{'}}{secrets.GITHUB_TOKEN}}
-          # Optional Plugins have to be enabled
-          use-linkcheck: true
-          use-mermaid: true
-          use-toc: true
-          use-opengh: true
-          use-admonish: true
+          mdbook-version: "latest"
+      - name: Install mdbook plugins
+        run: |
+          cargo install mdbook-linkcheck
+          cargo install mdbook-mermaid
+          cargo install mdbook-toc
+          cargo install mdbook-open-on-gh
+          cargo install mdbook-admonish
       - name: Show mdbook version
         run: mdbook --version
-      - name: Show linkchecker version
-        run: mdbook-linkcheck --version
-      - name: Show mermaid version
-        run: mdbook-mermaid --version
-      - name: Show toc version
-        run: mdbook-toc --version
-      - name: Show open-on-gh version
-        run: mdbook-open-on-gh --version
-      - name: Show admonish version
-        run: mdbook-admonish --version
-
+      - name: Show plugins versions
+        run: |
+          mdbook-linkcheck --version
+          mdbook-mermaid --version
+          mdbook-toc --version
+          mdbook-open-on-gh --version
+          mdbook-admonish --version
       - name: Build Book
         run: mdbook build
-
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: 'book'
-
+          # Upload the generated book directory
+          path: "book"
   # Single deploy job since we're just deploying
   deploy:
     # Add a dependency to the build job
     needs: build
-
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
-
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
     # Deploy to the github-pages environment
     environment:
       name: github-pages
-      url: ${{'{'}}{steps.deployment.outputs.page_url}}
-
+      url: ${{ steps.deployment.outputs.page_url }}
     # Specify runner + deployment step
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
-
+        uses: actions/deploy-pages@v4
